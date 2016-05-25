@@ -2471,7 +2471,24 @@ local function MakePartSelectGui(baseItem)
 					Text = '...',
 					ZIndex = 2,
 				}),
+				--GOLLY (USED TO COUNT STEPS HANDLES MOVED)
+				--rotateMoveUI.StepFrame.StepChanged
+				Make('TextLabel', {
+					Name = 'StepChanged',
+					Font = 'ArialBold',
+					FontSize = 'Size18',
+					TextColor3 = GuiSettings.TextColor,
+					Position = UD(1.05, renderSize.Y + marginSize, 0, marginSize),
+					Size = UD(0.9, 0, 0, lineSize),
+					BackgroundTransparency = 1,
+					TextStrokeTransparency = 0.8,
+					Text = "",
+					TextXAlignment = Enum.TextXAlignment.Left,
+				}),
+				--END GOLLY
 			}),
+			
+			
 		})
 	end
 
@@ -2712,11 +2729,14 @@ local function MakePartSelectGui(baseItem)
 			if rotateStepRad > 0 then
 				relAngle =  math.floor((relAngle / rotateStepRad) + 0.5) * rotateStepRad
 			end
+			--GOLLY
+			local ChangeInAngle = math.deg(relAngle) --TODO
+			rotateMoveUI.StepFrame.StepChanged.Text = ChangeInAngle
+			--END GOLLY
 
 			local item = getSelection()
 			local part = item.Item
 			local kfd = getCurrentKeyframeData(part, true, true)
-
 			local transform = CFrame.fromAxisAngle(Vector3.FromAxis(axisRaw), -relAngle)
 			
 			registerUndo( {
@@ -2774,6 +2794,7 @@ local function MakePartSelectGui(baseItem)
 
 	mRotateHandles.MouseButton1Down:connect(function() 
 		if (not modal) then
+			timelineUI.RootFrame.Active = false --GOLLY
 			local item = getSelection()
 			local part = item.Item
 			local kfd = getCurrentKeyframeData(part, true, true)
@@ -2789,6 +2810,7 @@ local function MakePartSelectGui(baseItem)
 	end)
 	
 	mRotateHandles.MouseButton1Up:connect(function()
+		timelineUI.RootFrame.Active = true --GOLLY
 		lockUndoStep("editRotate")
 	end)
 
@@ -2798,6 +2820,10 @@ local function MakePartSelectGui(baseItem)
 			if moveStep > 0 then
 				dist = math.floor(dist / moveStep) * moveStep
 			end
+			
+			--GOLLY
+			rotateMoveUI.StepFrame.StepChanged.Text = dist
+			--END GOLLY
 			
 			local item = getSelection()
 			local part = item.Item
@@ -2836,6 +2862,7 @@ local function MakePartSelectGui(baseItem)
 
 	mDragHandles.MouseButton1Down:connect(function() 
 		if (not modal) then
+			timelineUI.RootFrame.Active = false --GOLLY
 			local item = getSelection()
 			local part = item.Item
 			local kfd = getCurrentKeyframeData(part, true, true)
@@ -2846,6 +2873,7 @@ local function MakePartSelectGui(baseItem)
 	end)
 	
 	mDragHandles.MouseButton1Up:connect(function()
+		timelineUI.RootFrame.Active = true --GOLLY
 		lockUndoStep("editTransform")
 	end)
 
@@ -4772,6 +4800,7 @@ if (angleChangeUI == nil) then
 				BackgroundColor3 = Color3.new(98/255, 98/255, 98/255),
 				BackgroundTransparency = 0,
 				BorderSizePixel = 0,
+				Active = true, --GOLLY, will be toggled. On handle drag down; active = false. Once done dragging, will be Active again.
 				Make("ScrollingFrame", {
 					Name = "ScrollingFrame",
 					Position = UD(0, 0, 0, (lineSize + marginSize)),
@@ -6333,10 +6362,18 @@ function menuRequest(arg)
 	elseif arg == "SettingsHelp" then
 		Plugin:OpenWikiPage("Animations#Settings_Menu")
 	elseif arg == "New" then
-		registerUndo( {
-			action = "deleteKeyframe",
-		})
-		resetAnimation()
+		--GOLLY
+		modal = true
+		menuManager.GetWarning(Plugin, function(confirmed) 
+			modal = false 
+			if confirmed then
+				registerUndo( {
+				action = "deleteKeyframe",
+			})
+			resetAnimation()
+			end
+		end)
+		--END GOLLY
 	elseif arg == "Play" then
 		modal = true
 		playCurrentAnimation()
@@ -14234,6 +14271,229 @@ return module
 						</Item>
 					</Item>
 				</Item>
+				<Item class="Frame" referent="RBX9276D8A88C5541DF9505DD5B9EA21287">
+					<Properties>
+						<bool name="Active">false</bool>
+						<Color3 name="BackgroundColor3">4279242768</Color3>
+						<float name="BackgroundTransparency">0.5</float>
+						<Color3 name="BorderColor3">4279970357</Color3>
+						<int name="BorderSizePixel">0</int>
+						<bool name="ClipsDescendants">false</bool>
+						<bool name="Draggable">false</bool>
+						<string name="Name">Warning</string>
+						<Ref name="NextSelectionDown">null</Ref>
+						<Ref name="NextSelectionLeft">null</Ref>
+						<Ref name="NextSelectionRight">null</Ref>
+						<Ref name="NextSelectionUp">null</Ref>
+						<UDim2 name="Position">
+							<XS>0.5</XS>
+							<XO>-175</XO>
+							<YS>0.5</YS>
+							<YO>-50</YO>
+						</UDim2>
+						<float name="Rotation">0</float>
+						<bool name="Selectable">false</bool>
+						<Ref name="SelectionImageObject">null</Ref>
+						<UDim2 name="Size">
+							<XS>0</XS>
+							<XO>350</XO>
+							<YS>0</YS>
+							<YO>100</YO>
+						</UDim2>
+						<token name="SizeConstraint">0</token>
+						<token name="Style">0</token>
+						<bool name="Visible">true</bool>
+						<int name="ZIndex">1</int>
+					</Properties>
+					<Item class="TextButton" referent="RBXC13978C65942434EB0C2A660382941B4">
+						<Properties>
+							<bool name="Active">true</bool>
+							<bool name="AutoButtonColor">true</bool>
+							<Color3 name="BackgroundColor3">4284124895</Color3>
+							<float name="BackgroundTransparency">0</float>
+							<Color3 name="BorderColor3">4281413937</Color3>
+							<int name="BorderSizePixel">1</int>
+							<bool name="ClipsDescendants">false</bool>
+							<bool name="Draggable">false</bool>
+							<token name="Font">4</token>
+							<token name="FontSize">5</token>
+							<bool name="Modal">false</bool>
+							<string name="Name">Submit</string>
+							<Ref name="NextSelectionDown">null</Ref>
+							<Ref name="NextSelectionLeft">null</Ref>
+							<Ref name="NextSelectionRight">null</Ref>
+							<Ref name="NextSelectionUp">null</Ref>
+							<UDim2 name="Position">
+								<XS>0</XS>
+								<XO>15</XO>
+								<YS>0</YS>
+								<YO>60</YO>
+							</UDim2>
+							<float name="Rotation">0</float>
+							<bool name="Selectable">true</bool>
+							<bool name="Selected">false</bool>
+							<Ref name="SelectionImageObject">null</Ref>
+							<UDim2 name="Size">
+								<XS>0</XS>
+								<XO>150</XO>
+								<YS>0</YS>
+								<YO>25</YO>
+							</UDim2>
+							<token name="SizeConstraint">0</token>
+							<token name="Style">0</token>
+							<string name="Text">Yes</string>
+							<Color3 name="TextColor3">4294967295</Color3>
+							<bool name="TextScaled">false</bool>
+							<Color3 name="TextStrokeColor3">4278190080</Color3>
+							<float name="TextStrokeTransparency">0.75</float>
+							<float name="TextTransparency">0</float>
+							<bool name="TextWrapped">false</bool>
+							<token name="TextXAlignment">2</token>
+							<token name="TextYAlignment">1</token>
+							<bool name="Visible">true</bool>
+							<int name="ZIndex">1</int>
+						</Properties>
+					</Item>
+					<Item class="TextButton" referent="RBXAE967E2C790D4A4D890F9BC8DBB083A8">
+						<Properties>
+							<bool name="Active">true</bool>
+							<bool name="AutoButtonColor">true</bool>
+							<Color3 name="BackgroundColor3">4286874756</Color3>
+							<float name="BackgroundTransparency">0</float>
+							<Color3 name="BorderColor3">4281413937</Color3>
+							<int name="BorderSizePixel">1</int>
+							<bool name="ClipsDescendants">false</bool>
+							<bool name="Draggable">false</bool>
+							<token name="Font">4</token>
+							<token name="FontSize">5</token>
+							<bool name="Modal">false</bool>
+							<string name="Name">Cancel</string>
+							<Ref name="NextSelectionDown">null</Ref>
+							<Ref name="NextSelectionLeft">null</Ref>
+							<Ref name="NextSelectionRight">null</Ref>
+							<Ref name="NextSelectionUp">null</Ref>
+							<UDim2 name="Position">
+								<XS>0</XS>
+								<XO>185</XO>
+								<YS>0</YS>
+								<YO>60</YO>
+							</UDim2>
+							<float name="Rotation">0</float>
+							<bool name="Selectable">true</bool>
+							<bool name="Selected">false</bool>
+							<Ref name="SelectionImageObject">null</Ref>
+							<UDim2 name="Size">
+								<XS>0</XS>
+								<XO>150</XO>
+								<YS>0</YS>
+								<YO>25</YO>
+							</UDim2>
+							<token name="SizeConstraint">0</token>
+							<token name="Style">0</token>
+							<string name="Text">Cancel</string>
+							<Color3 name="TextColor3">4294967295</Color3>
+							<bool name="TextScaled">false</bool>
+							<Color3 name="TextStrokeColor3">4278190080</Color3>
+							<float name="TextStrokeTransparency">0.75</float>
+							<float name="TextTransparency">0</float>
+							<bool name="TextWrapped">false</bool>
+							<token name="TextXAlignment">2</token>
+							<token name="TextYAlignment">1</token>
+							<bool name="Visible">true</bool>
+							<int name="ZIndex">1</int>
+						</Properties>
+					</Item>
+					<Item class="TextLabel" referent="RBX33C0105507524587A33AFC99335D7258">
+						<Properties>
+							<bool name="Active">false</bool>
+							<Color3 name="BackgroundColor3">4281413937</Color3>
+							<float name="BackgroundTransparency">0</float>
+							<Color3 name="BorderColor3">4279970357</Color3>
+							<int name="BorderSizePixel">0</int>
+							<bool name="ClipsDescendants">false</bool>
+							<bool name="Draggable">false</bool>
+							<token name="Font">3</token>
+							<token name="FontSize">5</token>
+							<string name="Name">Topbar</string>
+							<Ref name="NextSelectionDown">null</Ref>
+							<Ref name="NextSelectionLeft">null</Ref>
+							<Ref name="NextSelectionRight">null</Ref>
+							<Ref name="NextSelectionUp">null</Ref>
+							<UDim2 name="Position">
+								<XS>0</XS>
+								<XO>0</XO>
+								<YS>0</YS>
+								<YO>0</YO>
+							</UDim2>
+							<float name="Rotation">0</float>
+							<bool name="Selectable">false</bool>
+							<Ref name="SelectionImageObject">null</Ref>
+							<UDim2 name="Size">
+								<XS>1</XS>
+								<XO>0</XO>
+								<YS>0</YS>
+								<YO>5</YO>
+							</UDim2>
+							<token name="SizeConstraint">0</token>
+							<string name="Text"></string>
+							<Color3 name="TextColor3">4279970357</Color3>
+							<bool name="TextScaled">false</bool>
+							<Color3 name="TextStrokeColor3">4278190080</Color3>
+							<float name="TextStrokeTransparency">1</float>
+							<float name="TextTransparency">0</float>
+							<bool name="TextWrapped">false</bool>
+							<token name="TextXAlignment">2</token>
+							<token name="TextYAlignment">1</token>
+							<bool name="Visible">true</bool>
+							<int name="ZIndex">1</int>
+						</Properties>
+					</Item>
+					<Item class="TextLabel" referent="RBX77D6E8B2A28B48C884EB440C7B354428">
+						<Properties>
+							<bool name="Active">false</bool>
+							<Color3 name="BackgroundColor3">4281413937</Color3>
+							<float name="BackgroundTransparency">1</float>
+							<Color3 name="BorderColor3">4279970357</Color3>
+							<int name="BorderSizePixel">0</int>
+							<bool name="ClipsDescendants">false</bool>
+							<bool name="Draggable">false</bool>
+							<token name="Font">4</token>
+							<token name="FontSize">5</token>
+							<string name="Name">Title</string>
+							<Ref name="NextSelectionDown">null</Ref>
+							<Ref name="NextSelectionLeft">null</Ref>
+							<Ref name="NextSelectionRight">null</Ref>
+							<Ref name="NextSelectionUp">null</Ref>
+							<UDim2 name="Position">
+								<XS>0</XS>
+								<XO>15</XO>
+								<YS>0</YS>
+								<YO>5</YO>
+							</UDim2>
+							<float name="Rotation">0</float>
+							<bool name="Selectable">false</bool>
+							<Ref name="SelectionImageObject">null</Ref>
+							<UDim2 name="Size">
+								<XS>1</XS>
+								<XO>0</XO>
+								<YS>0</YS>
+								<YO>20</YO>
+							</UDim2>
+							<token name="SizeConstraint">0</token>
+							<string name="Text">Are you sure? (Unsaved progress may be lost!)</string>
+							<Color3 name="TextColor3">4294967295</Color3>
+							<bool name="TextScaled">false</bool>
+							<Color3 name="TextStrokeColor3">4278190080</Color3>
+							<float name="TextStrokeTransparency">1</float>
+							<float name="TextTransparency">0</float>
+							<bool name="TextWrapped">false</bool>
+							<token name="TextXAlignment">0</token>
+							<token name="TextYAlignment">1</token>
+							<bool name="Visible">true</bool>
+							<int name="ZIndex">1</int>
+						</Properties>
+					</Item>
+				</Item>
 			</Item>
 			<Item class="ModuleScript" referent="RBXDE3BDE6B216F4657BFA8C6CAE06B1D81">
 				<Properties>
@@ -14436,6 +14696,30 @@ module.GetLoop = function(plugin, exitFunction)
 		end)
 		
 		gui.No.MouseButton1Click:connect(function()
+			module.activeWindow = nil
+			gui:Destroy()
+			exitFunction(false)
+		end)
+		
+		module.RegisterTooltip(gui.Yes, gui.Yes.Tooltip.Value)
+		module.RegisterTooltip(gui.No, gui.No.Tooltip.Value)
+		
+		module.activeWindow = gui
+	end
+end
+
+module.GetWarning = function(plugin, exitFunction)
+	if module.activeWindow == nil then
+		local gui = script.Parent.GUIs.Warning:clone()
+		gui.Parent = module.space
+		
+		gui.Submit.MouseButton1Click:connect(function()
+			module.activeWindow = nil
+			gui:Destroy()
+			exitFunction(true)
+		end)
+		
+		gui.Cancel.MouseButton1Click:connect(function()
 			module.activeWindow = nil
 			gui:Destroy()
 			exitFunction(false)
